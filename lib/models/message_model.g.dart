@@ -1,7 +1,10 @@
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'message_model.dart';
 
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class MessageModelAdapter extends TypeAdapter<MessageModel> {
   @override
@@ -16,20 +19,26 @@ class MessageModelAdapter extends TypeAdapter<MessageModel> {
     return MessageModel(
       text: fields[0] as String,
       isUser: fields[1] as bool,
-      time: fields[2] as String,
+      time: fields[2] as DateTime,
+      chatId: fields[3] as String,
+      title: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, MessageModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.text)
       ..writeByte(1)
       ..write(obj.isUser)
       ..writeByte(2)
-      ..write(obj.time);
+      ..write(obj.time)
+      ..writeByte(3)
+      ..write(obj.chatId)
+      ..writeByte(4)
+      ..write(obj.title);
   }
 
   @override

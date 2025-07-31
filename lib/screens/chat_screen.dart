@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:hive/hive.dart';
 
 import '../blocs/chat/chat_bloc.dart';
 import '../blocs/chat/chat_event.dart';
 import '../blocs/chat/chat_state.dart';
 import '../models/message_model.dart';
+import '../theme/theme_provider.dart';
+import 'chat_history_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -37,35 +42,47 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
         title: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'BotBuddy',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 18,
-              ),
-            ),
-            Text(
-              'Online',
-              style: TextStyle(
-                color: Colors.green,
-                fontSize: 12,
-              ),
-            ),
+            Text('BotBuddy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Online', style: TextStyle(color: Colors.green, fontSize: 12)),
           ],
         ),
         actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () => themeProvider.toggleTheme(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'Chat History',
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatHistoryScreen())),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'New Chat',
+            onPressed: () => context.read<ChatBloc>().add(NewChatEvent()),
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Share Chat',
+            onPressed: () {
+              final messages = context.read<ChatBloc>().state.messages;
+              final text = messages.map((m) => "${m.isUser ? 'You' : 'Bot'}: ${m.text}").join('\n\n');
+              Share.share(text, subject: 'Chat with BotBuddy');
+            },
+          ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
+            icon: Icon(Icons.more_vert, color: Theme.of(context).iconTheme.color),
             onSelected: (value) {
               if (value == 'clear') {
                 context.read<ChatBloc>().add(ClearChatHistoryEvent());
@@ -74,11 +91,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 );
               }
             },
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem(
-                value: 'clear',
-                child: Text('Clear Chat History'),
-              ),
+            itemBuilder: (BuildContext context) => const [
+              PopupMenuItem(value: 'clear', child: Text('Clear Chat History')),
             ],
           ),
         ],
@@ -99,8 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment:
-                      isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                      mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
                       children: [
                         if (!isUser) ...[
                           const CircleAvatar(
@@ -110,39 +123,70 @@ class _ChatScreenState extends State<ChatScreen> {
                           const SizedBox(width: 8),
                         ],
                         Flexible(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: isUser ? const Color(0xFF007AFF) : Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
+                          child: GestureDetector(
+                            onLongPress: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: const Text('Delete Message?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: isUser
-                                ? Text(
-                              message.text,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                height: 1.4,
+                              );
+
+                              if (confirm == true) {
+                                final box = Hive.box<MessageModel>('chatBox');
+                                await box.delete(message.key);
+                                context.read<ChatBloc>().add(
+                                  LoadChatHistoryEvent(chatId: context.read<ChatBloc>().currentChatId),
+                                );
+                              }
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isUser ? const Color(0xFFEDEDED) : Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: const Radius.circular(16),
+                                  topRight: const Radius.circular(16),
+                                  bottomLeft: Radius.circular(isUser ? 16 : 0),
+                                  bottomRight: Radius.circular(isUser ? 0 : 16),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            )
-                                : MarkdownBody(
-                              data: message.text,
-                              styleSheet: MarkdownStyleSheet(
-                                p: const TextStyle(
-                                  fontSize: 14,
+                              child: isUser
+                                  ? Text(
+                                message.text,
+                                style: const TextStyle(
                                   color: Colors.black87,
-                                  height: 1.5,
+                                  fontSize: 15,
+                                  height: 1.4,
                                 ),
-                                strong: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                              )
+                                  : MarkdownBody(
+                                data: message.text,
+                                styleSheet: MarkdownStyleSheet(
+                                  p: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                                    height: 1.5,
+                                  ),
+                                  strong: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -175,14 +219,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: messageController,
+                        textInputAction: TextInputAction.send,
+                        onFieldSubmitted: (value) {
+                          if (value.trim().isNotEmpty) {
+                            context.read<ChatBloc>().add(SendMessageEvent(value.trim()));
+                            messageController.clear();
+                          }
+                        },
                         decoration: InputDecoration(
                           hintText: "How can I help you today?",
                           filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
+                          fillColor: Theme.of(context).cardColor,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                             borderSide: BorderSide.none,
@@ -205,9 +253,12 @@ class _ChatScreenState extends State<ChatScreen> {
                           messageController.clear();
                         }
                       },
-                      backgroundColor: const Color(0xFF007AFF),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       mini: true,
-                      child: const Icon(Icons.send, color: Colors.white),
+                      child: Icon(
+                        Icons.send,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                   ],
                 ),
@@ -219,6 +270,10 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
+
+
+
+
 
 
 

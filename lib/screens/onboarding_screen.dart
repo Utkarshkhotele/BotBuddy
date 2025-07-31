@@ -28,15 +28,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Onboard> pages = [
     Onboard(
       title: 'Meet BotBuddy 🤖',
-      subtitle:
-      'Your AI Chat Assistant powered by Gemini API for smart replies.',
+      subtitle: 'Your AI Chat Assistant powered by Gemini API for smart replies.',
       lottie: 'chatbot.json',
-    ),
-    Onboard(
-      title: 'Ask Anything Instantly',
-      subtitle:
-      'From daily doubts to creative ideas, BotBuddy is always here.',
-      lottie: 'chat.json',
     ),
   ];
 
@@ -44,9 +37,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isWide = size.width > 600;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: PageView.builder(
         controller: _controller,
         itemCount: pages.length,
@@ -72,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   page.title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: theme.textTheme.bodyLarge?.color,
                     fontSize: isWide ? 32 : 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -82,7 +77,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   page.subtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: theme.textTheme.bodyMedium?.color,
                     fontSize: isWide ? 18 : 14,
                     height: 1.5,
                   ),
@@ -97,8 +92,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       width: i == _currentPage ? 14 : 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color:
-                        i == _currentPage ? Colors.red : Colors.grey[600],
+                        color: i == _currentPage
+                            ? theme.colorScheme.primary
+                            : theme.dividerColor,
                         borderRadius: BorderRadius.circular(5),
                       ),
                     ),
@@ -107,28 +103,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    if (isLast) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ChatScreen(),
-                        ),
-                      );
-                    } else {
-                      _controller.nextPage(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      );
-                    }
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ChatScreen(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: theme.primaryColorDark,
                     shape: const StadiumBorder(),
                     minimumSize: Size(size.width * 0.4, 48),
                   ),
                   child: Text(
-                    isLast ? 'Get Started' : 'Next',
-                    style: const TextStyle(color: Colors.white),
+                    'Get Started',
+                    style: TextStyle(color: theme.primaryTextTheme.labelLarge?.color),
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -140,5 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+
+
 
 

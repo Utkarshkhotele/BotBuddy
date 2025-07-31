@@ -1,12 +1,14 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
-import 'blocs/chat/chat_bloc.dart';
 import 'models/message_model.dart';
+import 'blocs/chat/chat_bloc.dart';
+import 'theme/theme_provider.dart';
+import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
 
 Future<void> main() async {
@@ -20,9 +22,22 @@ Future<void> main() async {
   }
 
   Hive.registerAdapter(MessageModelAdapter());
+
+  // ✅ TEMP: delete old corrupted box (RUN ONCE)
+  await Hive.deleteBoxFromDisk('chatBox');
+
+  // ✅ Then open fresh
   await Hive.openBox<MessageModel>('chatBox');
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        BlocProvider(create: (_) => ChatBloc()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -30,28 +45,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => ChatBloc()),
-      ],
-      child: MaterialApp(
-        title: 'BotBuddy',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF007AFF)),
-          useMaterial3: true,
-        ),
-        home: const SplashScreen(),
-      ),
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return MaterialApp(
+      title: 'BotBuddy',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: const SplashScreen(),
     );
   }
 }
-
-
-// its my entrypoint
-
-
-
-
-
