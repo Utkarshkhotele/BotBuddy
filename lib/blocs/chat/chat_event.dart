@@ -1,15 +1,32 @@
-abstract class ChatEvent {}
+import 'package:equatable/equatable.dart';
+
+abstract class ChatEvent extends Equatable {
+  const ChatEvent();
+
+  @override
+  List<Object?> get props => [];
+}
 
 class SendMessageEvent extends ChatEvent {
   final String userMessage;
-  SendMessageEvent(this.userMessage);
+  const SendMessageEvent(this.userMessage);
+
+  @override
+  List<Object?> get props => [userMessage];
 }
 
 class LoadChatHistoryEvent extends ChatEvent {
   final String chatId;
-  LoadChatHistoryEvent({required this.chatId});
+  const LoadChatHistoryEvent({required this.chatId});
+
+  @override
+  List<Object?> get props => [chatId];
 }
 
-class ClearChatHistoryEvent extends ChatEvent {}
+class ClearChatHistoryEvent extends ChatEvent {
+  const ClearChatHistoryEvent();
+}
 
-class NewChatEvent extends ChatEvent {} // 👈 For starting new chat session
+class NewChatEvent extends ChatEvent {
+  const NewChatEvent();
+}

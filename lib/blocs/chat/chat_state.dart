@@ -1,36 +1,35 @@
+import 'package:equatable/equatable.dart';
 import '../../models/message_model.dart';
 
-class ChatState {
+class ChatState extends Equatable {
   final List<MessageModel> messages;
   final String responseText;
   final bool isTyping;
-  final String currentChatId; // 👈 New field
 
-  ChatState({
+  const ChatState({
     required this.messages,
     required this.responseText,
     required this.isTyping,
-    required this.currentChatId,
   });
 
-  factory ChatState.initial() => ChatState(
+  factory ChatState.initial() => const ChatState(
     messages: [],
     responseText: '',
     isTyping: false,
-    currentChatId: DateTime.now().millisecondsSinceEpoch.toString(), // 👈 default
   );
 
   ChatState copyWith({
     List<MessageModel>? messages,
     String? responseText,
     bool? isTyping,
-    String? currentChatId,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
       responseText: responseText ?? this.responseText,
       isTyping: isTyping ?? this.isTyping,
-      currentChatId: currentChatId ?? this.currentChatId,
     );
   }
+
+  @override
+  List<Object?> get props => [messages, responseText, isTyping];
 }

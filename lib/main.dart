@@ -23,11 +23,14 @@ Future<void> main() async {
 
   Hive.registerAdapter(MessageModelAdapter());
 
-  // ✅ TEMP: delete old corrupted box (RUN ONCE)
-  await Hive.deleteBoxFromDisk('chatBox');
-
-  // ✅ Then open fresh
-  await Hive.openBox<MessageModel>('chatBox');
+  // Open existing box (don't delete it on every launch)
+  try {
+    await Hive.openBox<MessageModel>('chatBox');
+  } catch (e) {
+    debugPrint("Failed to open chatBox: $e");
+    // fallback: try again or handle gracefully
+    await Hive.openBox<MessageModel>('chatBox');
+  }
 
   runApp(
     MultiProvider(
@@ -52,8 +55,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      themeMode: themeProvider.themeMode,
       home: const SplashScreen(),
     );
   }
 }
+

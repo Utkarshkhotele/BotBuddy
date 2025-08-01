@@ -1,29 +1,47 @@
 import 'package:hive/hive.dart';
 
 part 'message_model.g.dart';
+
 @HiveType(typeId: 0)
 class MessageModel extends HiveObject {
   @HiveField(0)
-  final String text;
+  String text;
 
   @HiveField(1)
-  final bool isUser;
+  bool isUser;
 
   @HiveField(2)
-  final DateTime time;
+  DateTime time;
 
   @HiveField(3)
-  final String chatId;
+  String chatId;
 
   @HiveField(4)
-  final String? title; // ✅ make this nullable
+  String? title;
 
   MessageModel({
     required this.text,
     required this.isUser,
     required this.time,
     required this.chatId,
-    this.title, // ✅ keep optional
+    this.title,
   });
+
+  MessageModel copyWith({
+    String? text,
+    bool? isUser,
+    DateTime? time,
+    String? chatId,
+    String? title,
+  }) {
+    return MessageModel(
+      text: text ?? this.text,
+      isUser: isUser ?? this.isUser,
+      time: time ?? this.time,
+      chatId: chatId ?? this.chatId,
+      title: title ?? this.title,
+    );
+  }
 }
+
 

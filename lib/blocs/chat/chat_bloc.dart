@@ -8,32 +8,38 @@ import '../../models/message_model.dart';
 import '../../services/api_service.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  final Box<MessageModel> _chatBox = Hive.box<MessageModel>('chatBox');
-  String _currentChatId = const Uuid().v4(); // 🔑 Unique ID for current session
+  final Box<MessageModel> _chatBox;
+  String _currentChatId = const Uuid().v4();
 
-  ChatBloc() : super(ChatState.initial()) {
+  ChatBloc({Box<MessageModel>? injectedBox})
+      : _chatBox = injectedBox ?? Hive.box<MessageModel>('chatBox'),
+        super(ChatState.initial()) {
     on<LoadChatHistoryEvent>(_onLoadHistory);
     on<SendMessageEvent>(_onSendMessage);
     on<ClearChatHistoryEvent>(_onClearHistory);
     on<NewChatEvent>(_onNewChat);
 
-    // 🔄 Load messages for initial chat session
+    // Initial load for the fresh session
     add(LoadChatHistoryEvent(chatId: _currentChatId));
   }
 
-  // ✅ Load chat history for a specific session
   Future<void> _onLoadHistory(
       LoadChatHistoryEvent event,
       Emitter<ChatState> emit,
       ) async {
     _currentChatId = event.chatId;
-    final history = _chatBox.values
-        .where((msg) => msg.chatId == _currentChatId)
-        .toList();
-    emit(state.copyWith(messages: history));
+
+    try {
+      final history = _chatBox.values
+          .where((msg) => msg.chatId == _currentChatId)
+          .toList();
+      emit(state.copyWith(messages: history));
+    } catch (e) {
+      // In case something goes wrong with box access, fall back gracefully.
+      emit(state.copyWith(messages: []));
+    }
   }
 
-  // ✅ Send message and save to Hive (first message gets title)
   Future<void> _onSendMessage(
       SendMessageEvent event,
       Emitter<ChatState> emit,
@@ -43,17 +49,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final userMsg = MessageModel(
       text: event.userMessage,
       isUser: true,
-      time: DateTime.now(), // ✅ FIXED: use DateTime, not String
+      time: DateTime.now(),
       chatId: _currentChatId,
       title: isFirstMessage ? event.userMessage : null,
     );
 
     await _chatBox.add(userMsg);
 
-    final typingState = [...state.messages, userMsg];
-
+    final updatedMessages = [...state.messages, userMsg];
     emit(state.copyWith(
-      messages: typingState,
+      messages: updatedMessages,
       responseText: 'Thinking...',
       isTyping: true,
     ));
@@ -64,40 +69,49 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final botMsg = MessageModel(
       text: replyText,
       isUser: false,
-      time: DateTime.now(), // ✅ FIXED
+      time: DateTime.now(),
       chatId: _currentChatId,
     );
 
     await _chatBox.add(botMsg);
 
     emit(state.copyWith(
-      messages: [...typingState, botMsg],
+      messages: [...updatedMessages, botMsg],
       responseText: replyText,
       isTyping: false,
     ));
   }
 
-  // ✅ Clear all messages and reset session
+  /// Clears only the current session's messages (keeps other sessions intact)
   Future<void> _onClearHistory(
       ClearChatHistoryEvent event,
       Emitter<ChatState> emit,
       ) async {
-    await _chatBox.clear();
+    final toDelete = _chatBox.values
+        .where((msg) => msg.chatId == _currentChatId)
+        .toList();
+
+    for (final m in toDelete) {
+      await _chatBox.delete(m.key);
+    }
+
+    // Start a fresh session
     _currentChatId = const Uuid().v4();
     emit(ChatState.initial());
+    add(LoadChatHistoryEvent(chatId: _currentChatId));
   }
 
-  // ✅ Start a new chat session
   Future<void> _onNewChat(
       NewChatEvent event,
       Emitter<ChatState> emit,
       ) async {
     _currentChatId = const Uuid().v4();
     emit(ChatState.initial());
+    add(LoadChatHistoryEvent(chatId: _currentChatId));
   }
 
-  // 🧠 Optional: Access current chat session ID
   String get currentChatId => _currentChatId;
 }
+
 
 

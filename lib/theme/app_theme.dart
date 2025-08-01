@@ -1,5 +1,5 @@
-// lib/theme/app_theme.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
@@ -13,6 +13,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
         fontSize: 18,
       ),
+      systemOverlayStyle: SystemUiOverlayStyle.dark, // status bar icons dark
     ),
     colorScheme: ColorScheme.fromSeed(
       seedColor: const Color(0xFF007AFF), // iOS blue
@@ -20,6 +21,8 @@ class AppTheme {
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.black87),
+      bodyMedium: TextStyle(color: Colors.black87),
+      bodySmall: TextStyle(color: Colors.black54),
     ),
     useMaterial3: true,
   );
@@ -35,6 +38,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
         fontSize: 18,
       ),
+      systemOverlayStyle: SystemUiOverlayStyle.light, // status bar icons light
     ),
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.tealAccent,
@@ -42,8 +46,9 @@ class AppTheme {
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.white70),
+      bodyMedium: TextStyle(color: Colors.white70),
+      bodySmall: TextStyle(color: Colors.white54),
     ),
     useMaterial3: true,
   );
 }
-
