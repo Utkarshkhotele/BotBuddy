@@ -42,5 +42,7 @@ Set launcher icon:
 bash
 Copy code
 flutter pub run flutter_launcher_icons:main
+
+
 🛠 Tech
 Flutter • Dart • Lottie • Gemini API
