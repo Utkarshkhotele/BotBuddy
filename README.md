@@ -1,48 +1,26 @@
-# 🤖 BotBuddy – AI Chat Assistant
+# 🤖 BotBuddy – AI Chat Assistant  
 
-A Flutter AI chat app powered by the **Gemini API** with chat history, dark/light mode, and a modern animated UI.
-
----
-
-## 🚀 Demo
-🔗 **Live App:** [Try BotBuddy](http://elaborate-hamster-77b81b.netlify.app)
+> **An intelligent chat app built with Flutter, powered by Google's Gemini API, featuring modern animations, persistent chat history, and customizable themes.**  
 
 ---
 
-## ✨ Features
-- Dark/Light Mode toggle  
-- Save & Clear Chat History  
-- Start New Chat  
-- Lottie animated onboarding  
-- Custom logo & app name  
+## 🚀 Demo  
+🔗 **Live App:** [Try BotBuddy](http://elaborate-hamster-77b81b.netlify.app)  
 
 ---
 
-## 📂 Quick Setup
-```bash
-git clone https://github.com/Utkarshkhotele/BotBuddy.git
-cd BotBuddy
-flutter pub get
-flutter run
-Add assets in pubspec.yaml:
+## ✨ Features  
+✅ **Dark/Light Mode Toggle** – Switch themes instantly  
+✅ **Save & Clear Chat History** – Persistent conversations with option to clear  
+✅ **Start New Chat** – Reset and start fresh anytime  
+✅ **Lottie Animated Onboarding** – Smooth and modern welcome screen  
+✅ **Custom Logo & App Name** – Personalized branding for your app  
 
-yaml
-Copy code
-assets:
-  - assets/logo.png
-  - assets/chatbot.json
-Change app name:
+---
 
-Android: android/app/src/main/res/values/strings.xml
+## 🛠 Tech Stack  
+- **Flutter** – Cross-platform app framework  
+- **Dart** – Programming language  
+- **Gemini API** – AI chat intelligence  
+- **Lottie** – Animation assets  
 
-iOS: ios/Runner/Info.plist
-
-Set launcher icon:
-
-bash
-Copy code
-flutter pub run flutter_launcher_icons:main
-
-
-🛠 Tech
-Flutter • Dart • Lottie • Gemini API
