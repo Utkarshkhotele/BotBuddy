@@ -30,10 +30,11 @@
 
 ---
 
-## 📦 Quick Start  
+# 📦 Quick Start
+
 ```bash
 # Clone the repository
-git clone https://github.com/YourUsername/BotBuddy.git
+git clone https://github.com/Utkarshkhotele/BotBuddy.git
 
 # Navigate into the folder
 cd BotBuddy
@@ -43,19 +44,24 @@ flutter pub get
 
 # Run the app
 flutter run
-
-
 🧠 How It Works
-User sends a message – captured via Flutter chat UI.
-Message sent to Gemini API – processed for AI response.
-AI responds – displayed in chat bubble and stored locally in Hive DB.
-Theme + History – managed via Provider & BLoC for performance.
+User sends a message — captured via Flutter chat UI.
+
+Message sent to Gemini API — processed for AI response.
+
+AI responds — displayed in chat bubble and stored locally in Hive DB.
+
+Theme and chat history — managed via Provider & BLoC for smooth performance.
 
 👨‍💻 Contributing
 Contributions are welcome!
-Fork the repo
-Create your branch: git checkout -b feature-name
-Commit your changes: git commit -m 'Add new feature'
-Push to branch: git push origin feature-name
-Submit a Pull Request 🚀
 
+Fork the repo
+
+Create your branch: git checkout -b feature-name
+
+Commit your changes: git commit -m 'Add new feature'
+
+Push to the branch: git push origin feature-name
+
+Submit a Pull Request 🚀
