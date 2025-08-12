@@ -1,9 +1,5 @@
 # 🤖 BotBuddy – AI Chat Assistant  
 
-<p align="center">
-  <img src="assets/logo.png" alt="BotBuddy Logo" width="150"/>
-</p>  
-
 > **An intelligent chat app built with Flutter, powered by Google's Gemini API, featuring modern animations, persistent chat history, and customizable themes.**  
 
 ---
@@ -21,13 +17,6 @@
 ✅ **Custom Logo & App Name** – Personalized branding for your app  
 ✅ **Responsive UI** – Works on mobile, tablet, and desktop  
 ✅ **Offline Safe** – Chat history remains even without internet  
-
----
-
-## 📸 Screenshots  
-| Onboarding Screen | Chat (Light) | Chat (Dark) |  
-|-------------------|--------------|-------------|  
-| ![](screenshots/onboarding.png) | ![](screenshots/chat_light.png) | ![](screenshots/chat_dark.png) |  
 
 ---
 
