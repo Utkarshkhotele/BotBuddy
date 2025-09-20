@@ -4,7 +4,6 @@
 
 ---
 
-
 ## 🚀 Demo  
 🔗 **Live App:** [Try BotBuddy](http://elaborate-hamster-77b81b.netlify.app)  
 
