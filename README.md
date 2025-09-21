@@ -10,7 +10,6 @@
 ---
 
 
-
 ## ✨ Features  
 ✅ **Dark/Light Mode Toggle** – Switch themes instantly  
 ✅ **Save & Clear Chat History** – Persistent conversations with option to clear  
