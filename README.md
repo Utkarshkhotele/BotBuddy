@@ -3,6 +3,7 @@
 > **An intelligent chat app built with Flutter, powered by Google's Gemini API, featuring modern animations, persistent chat history, and customizable themes.**  
 ---
 
+
 ## 🚀 Demo  
 🔗 **Live App:** [Try BotBuddy](http://elaborate-hamster-77b81b.netlify.app) 
 
